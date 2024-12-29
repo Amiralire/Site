@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNS Generator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #000000, #001a4d);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        h1 {
+            color: #007bff;
+            text-shadow: 2px 2px 5px black;
+        }
+        select, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+        }
+        button {
+            background-color: #0056b3;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        button:hover {
+            background-color: #004080;
+        }
+        .output {
+            background-color: rgba(0, 51, 102, 0.8);
+            padding: 20px;
+            margin-top: 20px;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            color: white;
+            text-align: left;
+        }
+        .save-btn {
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .save-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>DNS Generator</h1>
+    <div>
+        <label for="country">Select Country:</label>
+        <select id="country">
+            <option value="germany">Germany</option>
+            <option value="uk">United Kingdom</option>
+            <option value="uae">United Arab Emirates</option>
+        </select>
+    </div>
+    <div>
+        <label for="ipType">Select IP Type:</label>
+        <select id="ipType">
+            <option value="ipv4">IPv4</option>
+            <option value="ipv6">IPv6</option>
+        </select>
+    </div>
+    <div>
+        <button onclick="generateDNS()">Generate DNS</button>
+    </div>
+    <div class="output" id="output">
+        <p>Your generated DNS will appear here...</p>
+    </div>
+
+    <script>
+        const ipv4Ranges = {
+            germany: "84.17",
+            uk: "91.189",
+            uae: "194.170"
+        };
+
+        const ipv6Ranges = {
+            germany: "2001:db8:1234::/48",
+            uk: "2a00:1450:4001::/48",
+            uae: "2a02:8e00::/32"
+        };
+
+        function generateIPv4(country) {
+            const base = ipv4Ranges[country];
+            const part1 = Math.floor(Math.random() * 256);
+            const part2 = Math.floor(Math.random() * 256);
+            return `${base}.${part1}.${part2}`;
+        }
+
+        function generateIPv6(country) {
+            const base = ipv6Ranges[country];
+            const randomSegment = () => Math.floor(Math.random() * 65536).toString(16);
+            return base.replace("::", `:${randomSegment()}:${randomSegment()}:${randomSegment()}`);
+        }
+
+        function generateDNS() {
+            const country = document.getElementById("country").value;
+            const ipType = document.getElementById("ipType").value;
+            const output = document.getElementById("output");
+
+            let generatedDNS = "";
+            if (ipType === "ipv4") {
+                generatedDNS = generateIPv4(country);
+            } else if (ipType === "ipv6") {
+                generatedDNS = generateIPv6(country);
+            }
+
+            output.innerHTML = `<p>Generated DNS: <strong>${generatedDNS}</strong></p>
+                                <button class="save-btn" onclick="saveDNS('${generatedDNS}')">Save DNS</button>`;
+        }
+
+        function saveDNS(dns) {
+            const blob = new Blob([dns], { type: "text/plain" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "generated_dns.txt";
+            link.click();
+        }
+    </script>
+</body>
+</html>
